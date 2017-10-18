@@ -1,0 +1,9 @@
+{
+		"name": "XNAT",
+		"short_name": "XNAT",
+		"version": "1.7",
+		"description": "XNAT is an open source imaging informatics. It facilitates common management, productivity, and quality assurance tasks for imaging and associated data. Thanks to its extensibility, XNAT can be used to support a wide range of imaging-based projects.",
+		"catalogue_url": "",
+		"application_url": "https://www.xnat.org",
+		"tags": ["Imaging", "Digital Pathology"]
+}

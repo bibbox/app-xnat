@@ -1,7 +1,7 @@
 # XNAT BIBBOX application
 
 ## Hints
-* approx. time with medium fast internet connection: **51 minutes**
+* approx. time with medium fast internet connection: **15 minutes**
 * initial user/passwordd: **xxxx / xxxxx**
 
 

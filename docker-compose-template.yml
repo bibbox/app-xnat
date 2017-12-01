@@ -6,42 +6,42 @@ networks:
       
 services:
 
-  §§INSTANCE-seeddms:
-    image: bibbox/seeddms
-    container_name:  §§INSTANCE-seeddms
+  §§INSTANCE-xnat:
+    image: bibbox/xnatweb
+    container_name:  §§INSTANCE-xnat
     restart: unless-stopped
     networks:
       - bibbox-default-network
     links:
-      - §§INSTANCE-seeddms-db:seeddms-db
+      - §§INSTANCE-xnat-db:xnat-db
     ports:
       - "§§PORT:80"
     depends_on:
-      - §§INSTANCE-seeddms-db
-      - §§INSTANCE-seeddms-data
+      - §§INSTANCE-xnat-db
+      - §§INSTANCE-xnat-data
     volumes_from: 
-      - §§INSTANCE-seeddms-data
+      - §§INSTANCE-xnat-data
+    environment:   
+       DB_HOST: xnat-db
+       DB_NAME: xnat
+       DB_USER: xnat
+       DB_PASSWORD: §§POSTGRES_PASSWORD
 
-  §§INSTANCE-seeddms-db:
-    image: mysql:8
-    container_name: §§INSTANCE-seeddms-db
+  §§INSTANCE-xnat-db:
+    build: ./images/postgres/
+    container_name: §§INSTANCE-xnat-db
     restart: unless-stopped
     networks:
       - bibbox-default-network
-    user: root
     environment:
-      - MYSQL_ROOT_PASSWORD=§§MYSQL_ROOT_PASSWORD
-      - MYSQL_DATABASE=seeddms
-      - MYSQL_USER=seeddms
-      - MYSQL_PASSWORD=§§MYSQL_USER_PASSWORD
+      -  POSTGRES_PASSWORD=§§POSTGRES_PASSWORD
     volumes_from: 
       - §§INSTANCE-seeddms-data
     depends_on:
       - §§INSTANCE-seeddms-data
 
-  §§INSTANCE-seeddms-data:
+  §§INSTANCE-xnat-data:
     image: busybox
-    container_name: §§INSTANCE-seeddms-data
+    container_name: §§INSTANCE-xnat-data
     volumes:
-      - ./var/lib/mysql:/var/lib/mysql
-      - ./var/www/seeddms51x/data:/var/www/seeddms51x/data
+      - ./var/lib/postgresql/data:/var/lib/postgresql/data

@@ -1,0 +1,11 @@
+[
+    {
+       "id":"POSTGRES_PASSWORD,
+       "display_name":"Postgres DB Password",
+       "type":"text",
+       "default_value":"changethispasswordinproductionenvironments",
+       "description":" Password for Postgres DB (change in production)",
+       "min_length": "1",
+       "max_length": "128"
+    }
+]

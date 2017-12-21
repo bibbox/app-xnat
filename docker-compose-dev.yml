@@ -6,45 +6,43 @@ networks:
       
 services:
 
-  §§INSTANCE-xnat:
+  DEV-xnat:
     build: ./images/xnatweb
-    container_name:  §§INSTANCE-xnat
+    container_name:  DEV-xnat
     restart: unless-stopped
     networks:
       - bibbox-default-network
     links:
-      - §§INSTANCE-xnat-db:xnat-db
+      - DEV-xnat-db:xnat-db
     ports:
       - "§§PORT:80"
     depends_on:
-      - §§INSTANCE-xnat-db
-      - §§INSTANCE-xnat-data
+      - DEV-xnat-db
+      - DEV-xnat-data
     volumes_from: 
-      - §§INSTANCE-xnat-data
+      - DEV-xnat-data
     environment:   
        DB_HOST: xnat-db
        DB_NAME: xnat
        DB_USER: xnat
        DB_PASSWORD: §§POSTGRES_PASSWORD
 
-  §§INSTANCE-xnat-db:
+  DEV-xnat-db:
     build: ./images/postgres/
-    container_name: §§INSTANCE-xnat-db
+    container_name: DEV-xnat-db
     restart: unless-stopped
     networks:
       - bibbox-default-network
     environment:
       -  POSTGRES_PASSWORD=§§POSTGRES_PASSWORD
     volumes_from: 
-      - §§INSTANCE-xnat-data
+      - DEV-xnat-data
     depends_on:
-      - §§INSTANCE-xnat-data
+      - DEV-xnat-data
 
-  §§INSTANCE-xnat-data:
+  DEV-xnat-data:
     image: busybox
-    container_name: §§INSTANCE-xnat-data
+    container_name: DEV-xnat-data
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
-        ./data/webapps:/opt/tomcat/webapps
-        ./data/xnat:/data/xnat/home/plugins
-
+      - ./data/xnat:/data/xnat

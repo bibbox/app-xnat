@@ -1,4 +1,4 @@
 {
-  runningcontainers:["§§INSTANCE-seeddms", "§§INSTANCE-seeddms-db"],
-  supportcontainers:["§§INSTANCE-seeddms-data"]    
+  runningcontainers:["§§INSTANCE-xnat", "§§INSTANCE-xnat-db"],
+  supportcontainers:["§§INSTANCE-xnat-data"]    
 }

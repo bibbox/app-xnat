@@ -1,44 +1,73 @@
-FROM tomcat:7.0.68-jre7
+FROM manishkumr/ubuntu_jdk7_image
 
-RUN apt-get update \
-    && apt-get install -y postgresql-client-9.4 \
-                          openjdk-7-jdk \
-                          git
+MAINTAINER Manish Kumar <rishimanish123@gmail.com>
 
-RUN curl -L -o /tmp/dockerize.tar.gz https://github.com/jwilder/dockerize/releases/download/v0.2.0/dockerize-linux-amd64-v0.2.0.tar.gz \
-    && tar -C /usr/local/bin -xzvf /tmp/dockerize.tar.gz \
-    && rm /tmp/dockerize.tar.gz
+ENV TOMCAT_VERSION 7.0.79
 
-COPY start /builder/
-COPY config.tmpl /xnat/
+RUN apt-get -qq update && \
+    apt-get -q -y upgrade && \
+    apt-get install -y sudo curl wget locales
 
-ARG XNAT_VERSION=1.6.5
+# Set locales
+RUN locale-gen en_AU.UTF-8
+ENV LANG en_AU.UTF-8  
+ENV LANGUAGE en_AU.UTF-8  
+ENV LC_ALL en_AU.UTF-8 
 
-ENV XNAT_INSTALLER_DIR=/builder/xnat-installer \
-    XNAT_VERSION=$XNAT_VERSION \
-    JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64 \
-    MAVEN_HOME=/xnat/xnat/plugin-resources/maven-1.0.2
+# Fix sh
+RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 
-RUN mkdir -p /builder /xnat/xnat \
-    && chmod +x /builder/start \
-    && git clone https://github.com/chaselgrove/xnat-installer.git /builder/xnat-installer \
-    && curl -o /tmp/xnat-$XNAT_VERSION.tar.gz ftp://ftp.nrg.wustl.edu/pub/xnat/xnat-$XNAT_VERSION.tar.gz \
-    && tar zxvf /tmp/xnat-$XNAT_VERSION.tar.gz --strip 1 -C /xnat/xnat \
-    && rm /tmp/xnat-$XNAT_VERSION.tar.gz
+ENV TOMCAT_MAJOR 7
+ENV TOMCAT_VERSION 7.0.82
+# Get Tomcat
+ENV TOMCAT_TGZ_URLS \
+    https://www.apache.org/dyn/closer.cgi?action=download&filename=tomcat/tomcat-$TOMCAT_MAJOR/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz \
+    # if the version is outdated, we might have to pull from the dist/archive :/
+    https://www-us.apache.org/dist/tomcat/tomcat-$TOMCAT_MAJOR/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz \
+    https://www.apache.org/dist/tomcat/tomcat-$TOMCAT_MAJOR/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz \
+    https://archive.apache.org/dist/tomcat/tomcat-$TOMCAT_MAJOR/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz
 
-# Run Maven once to download external jars as the repository is not always available
-RUN cd /xnat/xnat && /xnat/xnat/plugin-resources/maven-1.0.2/bin/maven \
-      -Dmaven.repo.remote=http://maven.xnat.org/xnat-maven1,http://repo1.maven.org/maven,http://mirrors.ibiblio.org/pub/mirrors/maven,http://mirrors.ibiblio.org/maven \
-      xdat:setupLib
+RUN set -eux; \
+        \
+        success=; \
+        for url in $TOMCAT_TGZ_URLS; do \
+                if wget -O /tmp/tomcat.tgz "$url"; then \
+                        success=1; \
+                        break; \
+                fi; \
+        done; \
+        [ -n "$success" ]; \
+        tar xzvf /tmp/tomcat.tgz -C /opt && \
+        mv /opt/apache-tomcat-${TOMCAT_VERSION} /opt/tomcat && \
+        rm /tmp/tomcat.tgz && \
+        rm -rf /opt/tomcat/webapps/*
 
-# Override /builder/xnat-installer/bin/build with our adapted version
-COPY installer-build /builder/xnat-installer/bin/build
+# Add admin/admin user
+ADD tomcat-users.xml /opt/tomcat/conf/
+# add server.xml
+ADD server.xml /opt/tomcat/conf/
+# Add xnat.home to config
+ADD setenv.sh /opt/tomcat/bin
+ENV CATALINA_HOME /opt/tomcat
+ENV PATH $PATH:$CATALINA_HOME/bin
 
-WORKDIR /builder
+RUN adduser --disabled-password --gecos '' xnat
 
-VOLUME /xnat/data
+VOLUME "/opt/tomcat/webapps"
+ADD setenv.sh /opt/tomcat/bin
+WORKDIR /opt/tomcat
+
+RUN wget --quiet --no-cookies https://bintray.com/nrgxnat/applications/download_file?file_path=xnat-web-1.7.4.war -O /opt/tomcat/xnat-web-1.7.4.war
+RUN mv /opt/tomcat/xnat-web-1.7.4.war /opt/tomcat/webapps
+
+ADD scripts /scripts
+WORKDIR /scripts
+RUN chmod a+x *.sh
+
 EXPOSE 8080
+EXPOSE 8009
+ENTRYPOINT [ "/scripts/entrypoint.sh" ]
 
-CMD ["/builder/start"]
 
-# eof
+
+

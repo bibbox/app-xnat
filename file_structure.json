@@ -1,6 +1,21 @@
 {
   "makefolders":[
-    "var/lib/postgresql/data"
+    "data/postgres",
+    "data/xnat/archive",
+    "data/xnat/build",
+    "data/xnat/cache",
+    "data/xnat/ftp",
+    "data/xnat/home/config",
+    "data/xnat/home/logs",
+    "data/xnat/home/plugins",
+    "data/xnat/home/work",
+    "data/xnat/pipeline",
+    "data/xnat/prearchive"  
   ],
-  "copyfiles":[]
+  "copyfiles":[
+        {
+            "source":"config/xnat-conf.properties",
+            "destination":"data/xnat/home/xnat-conf.properties"
+        }
+    ]
 }

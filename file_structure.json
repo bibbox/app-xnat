@@ -16,6 +16,10 @@
         {
             "source":"config/xnat-conf.properties",
             "destination":"data/xnat/home/config/xnat-conf.properties"
-        }
+        },
+        {
+      "source":"virtualhost_http.template",
+      "destination":"virtualhost_http.template"
+       }
     ]
 }

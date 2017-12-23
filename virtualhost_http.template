@@ -1,0 +1,9 @@
+<VirtualHost *:80>
+        ServerName §§subdomain.§§url
+
+        ProxyRequests           Off
+        ProxyPreserveHost       On
+
+		ProxyPass               /       http://§§ip:§§port/xnat
+        ProxyPassReverse        /       http://§§ip:§§port/xnat
+</VirtualHost>

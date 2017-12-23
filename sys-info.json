@@ -1,4 +1,4 @@
 {
-  runningcontainers:["§§INSTANCE-xnat", "§§INSTANCE-xnat-db"],
+  runningcontainers:["§§INSTANCE-xnatweb", "§§INSTANCE-xnat-db"],
   supportcontainers:["§§INSTANCE-xnat-data"]    
 }

@@ -15,7 +15,7 @@
   "copyfiles":[
         {
             "source":"config/xnat-conf.properties",
-            "destination":"data/xnat/home/xnat-conf.properties"
+            "destination":"data/xnat/home/config/xnat-conf.properties"
         }
     ]
 }

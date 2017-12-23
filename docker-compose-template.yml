@@ -6,7 +6,7 @@ networks:
       
 services:
 
-  §§INSTANCE-xnat:
+  §§INSTANCE-xnatweb:
     image: bibbox/xnatweb
     container_name:  §§INSTANCE-xnatweb
     restart: unless-stopped
@@ -15,7 +15,7 @@ services:
     links:
       - §§INSTANCE-xnat-db:xnat-db
     ports:
-      - "§§PORT:80"
+      - "§§PORT:8080"
     depends_on:
       - §§INSTANCE-xnat-db
       - §§INSTANCE-xnat-data

@@ -1,73 +1,16 @@
-FROM manishkumr/ubuntu_jdk7_image
+FROM tomcat:7.0.82-jre7-alpine
 
-MAINTAINER Manish Kumar <rishimanish123@gmail.com>
+ADD tomcat-users.xml    /usr/local/tomcat/conf/
+ADD server.xml          /usr/local/tomcat/conf/
+ADD setenv.sh           /usr/local/tomcat/bin
 
-ENV TOMCAT_VERSION 7.0.79
+RUN adduser -D -g '' xnat
 
-RUN apt-get -qq update && \
-    apt-get -q -y upgrade && \
-    apt-get install -y sudo curl wget locales
-
-# Set locales
-RUN locale-gen en_AU.UTF-8
-ENV LANG en_AU.UTF-8  
-ENV LANGUAGE en_AU.UTF-8  
-ENV LC_ALL en_AU.UTF-8 
-
-# Fix sh
-RUN rm /bin/sh && ln -s /bin/bash /bin/sh
-
-ENV TOMCAT_MAJOR 7
-ENV TOMCAT_VERSION 7.0.82
-# Get Tomcat
-ENV TOMCAT_TGZ_URLS \
-    https://www.apache.org/dyn/closer.cgi?action=download&filename=tomcat/tomcat-$TOMCAT_MAJOR/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz \
-    # if the version is outdated, we might have to pull from the dist/archive :/
-    https://www-us.apache.org/dist/tomcat/tomcat-$TOMCAT_MAJOR/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz \
-    https://www.apache.org/dist/tomcat/tomcat-$TOMCAT_MAJOR/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz \
-    https://archive.apache.org/dist/tomcat/tomcat-$TOMCAT_MAJOR/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz
-
-RUN set -eux; \
-        \
-        success=; \
-        for url in $TOMCAT_TGZ_URLS; do \
-                if wget -O /tmp/tomcat.tgz "$url"; then \
-                        success=1; \
-                        break; \
-                fi; \
-        done; \
-        [ -n "$success" ]; \
-        tar xzvf /tmp/tomcat.tgz -C /opt && \
-        mv /opt/apache-tomcat-${TOMCAT_VERSION} /opt/tomcat && \
-        rm /tmp/tomcat.tgz && \
-        rm -rf /opt/tomcat/webapps/*
-
-# Add admin/admin user
-ADD tomcat-users.xml /opt/tomcat/conf/
-# add server.xml
-ADD server.xml /opt/tomcat/conf/
-# Add xnat.home to config
-ADD setenv.sh /opt/tomcat/bin
-ENV CATALINA_HOME /opt/tomcat
-ENV PATH $PATH:$CATALINA_HOME/bin
-
-RUN adduser --disabled-password --gecos '' xnat
-
-VOLUME "/opt/tomcat/webapps"
-ADD setenv.sh /opt/tomcat/bin
-WORKDIR /opt/tomcat
-
-RUN wget --quiet --no-cookies https://bintray.com/nrgxnat/applications/download_file?file_path=xnat-web-1.7.4.war -O /opt/tomcat/xnat-web-1.7.4.war
-RUN mv /opt/tomcat/xnat-web-1.7.4.war /opt/tomcat/webapps
+RUN wget --quiet --no-cookies https://bintray.com/nrgxnat/applications/download_file?file_path=xnat-web-1.7.4.war -O /usr/local/tomcat/webapps/xnat.war
+#ADD xnat-web-1.7.4.war /usr/local/tomcat/webapps/xnat.war
 
 ADD scripts /scripts
 WORKDIR /scripts
 RUN chmod a+x *.sh
 
-EXPOSE 8080
-EXPOSE 8009
-ENTRYPOINT [ "/scripts/entrypoint.sh" ]
-
-
-
-
+ENTRYPOINT ["/scripts/entrypoint.sh"]

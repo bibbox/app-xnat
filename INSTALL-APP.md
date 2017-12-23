@@ -1,6 +1,8 @@
 ## XNAT Installation Instructions 
 
-* put the XNAT install isntructions here
+* the deploymend of the XNAT war may take some minutes, be patient
+* initial user/passwordd: **admin / admin**
+
 
 ## After the installation
 

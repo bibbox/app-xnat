@@ -6,43 +6,42 @@ networks:
       
 services:
 
-  DEV-xnat:
-    build: ./images/xnatweb
-    container_name:  DEV-xnat
+  dev-xnat:
+    image: xnatweblocal
+    container_name:  dev-xnat-local
     restart: unless-stopped
     networks:
       - bibbox-default-network
     links:
-      - DEV-xnat-db:xnat-db
+      - dev-xnat-db:xnat-db
     ports:
-      - "§§PORT:80"
-    depends_on:
-      - DEV-xnat-db
-      - DEV-xnat-data
-    volumes_from: 
-      - DEV-xnat-data
+      - "8077:8080"
     environment:   
-       DB_HOST: xnat-db
-       DB_NAME: xnat
-       DB_USER: xnat
-       DB_PASSWORD: §§POSTGRES_PASSWORD
+       DB_PASSWORD: newpassword__newpassword
+    depends_on:
+      - dev-xnat-db
+      - dev-xnat-data
+    volumes_from: 
+      - dev-xnat-data
 
-  DEV-xnat-db:
-    build: ./images/postgres/
-    container_name: DEV-xnat-db
+  dev-xnat-db:
+    image: postgres:9.6.5-alpine
+    container_name: dev-xnat-db
     restart: unless-stopped
     networks:
       - bibbox-default-network
     environment:
-      -  POSTGRES_PASSWORD=§§POSTGRES_PASSWORD
+      - POSTGRES_PASSWORD=newpassword__newpassword
+      - POSTGRES_USER=xnat
+      - POSTGRES_DB=xnat 
     volumes_from: 
-      - DEV-xnat-data
+      - dev-xnat-data
     depends_on:
-      - DEV-xnat-data
+      - dev-xnat-data
 
-  DEV-xnat-data:
+  dev-xnat-data:
     image: busybox
-    container_name: DEV-xnat-data
+    container_name: dev-xnat-data
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
       - ./data/xnat:/data/xnat

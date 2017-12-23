@@ -4,6 +4,6 @@
         ProxyRequests           Off
         ProxyPreserveHost       On
 
-		ProxyPass               /       http://§§ip:§§port
-        ProxyPassReverse        /       http://§§ip:§§port
+		ProxyPass               /       http://§§ip:§§port/
+        ProxyPassReverse        /       http://§§ip:§§port/
 </VirtualHost>

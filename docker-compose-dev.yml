@@ -7,7 +7,7 @@ networks:
 services:
 
   dev-xnat:
-    image: bibbox/xnatweb
+    image: xnatweblocal
     container_name:  dev-xnat-local
     restart: unless-stopped
     networks:

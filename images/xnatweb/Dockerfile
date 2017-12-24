@@ -6,8 +6,11 @@ ADD setenv.sh           /usr/local/tomcat/bin
 
 RUN adduser -D -g '' xnat
 
-RUN wget --quiet https://bintray.com/nrgxnat/applications/download_file?file_path=xnat-web-1.7.4.war -O /usr/local/tomcat/webapps/xnat.war
-#ADD xnat-web-1.7.4.war /usr/local/tomcat/webapps/xnat.war
+RUN ["rm", "-fr", "/usr/local/tomcat/webapps/ROOT"]
+RUN wget --quiet https://bintray.com/nrgxnat/applications/download_file?file_path=xnat-web-1.7.4.war -O /usr/local/tomcat/webapps/ROOT.war
+
+#use this for local development
+#ADD xnat-web-1.7.4.war /usr/local/tomcat/webapps/ROOT.war
 
 ADD scripts /scripts
 WORKDIR /scripts
